@@ -1,83 +1,36 @@
 //ArdroneNavdata.h
 //Oskar
+/*
+Datamonitor to store the navdata from the ardrone. It stores the
+navdata as is, i.e. as an "ardrone_autonomy::Navdata"
+ */
+
 #include <boost/thread.hpp>
+#include <ardrone_autonomy/Navdata.h>
 
 #ifndef _ARDRONE_NAVDATA
 #define _ARDRONE_NAVDATA
+
+
 class ArdroneNavdata {
 private:
     boost::mutex mtx_;
-    double rotX, rotY, rotZ;
-    double altd;
-    double vx,vy,vz;
-    double ax,ay,az; //not updated or read yet
-//Some more things maybe, tags etc.
+    ardrone_autonomy::Navdata local_navdata;
 
 public:
-    double Read_rotX() 
+    ardrone_autonomy::Navdata Read_navdata() 
     {
 	mtx_.lock();
-	double _rotX=rotX;
+	ardrone_autonomy::Navdata _navdata = local_navdata;
 	mtx_.unlock();
-	return _rotX;
-    }
-
-    double Read_rotY() 
-    {
-	mtx_.lock();
-	double _rotY=rotY;
-	mtx_.unlock();
-	return _rotY;
-    }
-
-    double Read_rotZ() 
-    {
-	mtx_.lock();
-	double _rotZ=rotZ;
-	mtx_.unlock();
-	return _rotZ;
-    }
-
-    double Read_altd() 
-    {
-	mtx_.lock();
-	double _altd=altd;
-	mtx_.unlock();
-	return _altd;
-    }
-	
-    double Read_vx() 
-    {
-	mtx_.lock();
-	double _vx=vx;
-	mtx_.unlock();
-	return _vx;
-    }
-
-
-    double Read_vy() 
-    {
-	mtx_.lock();
-	double _vy=vy;
-	mtx_.unlock();
-	return _vy;
-    }
-
-    double Read_vz() 
-    {
-	mtx_.lock();
-	double _vz=vz;
-	mtx_.unlock();
-	return _vz;
-    }
-
-    void Update(){
+	return _navdata;
+	}
+    void Update(const ardrone_autonomy::Navdata::ConstPtr& msg){
         mtx_.lock();
-        //Read new values on navdata
-	//rotX = ...
-	// ...
+	local_navdata = *msg;
         mtx_.unlock();
     }
-};
+} ardrone_navdata;
+
 
 #endif
