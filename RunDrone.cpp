@@ -1,4 +1,4 @@
-#include "autopilot/ControlNode.h"
+#include "../autopilot/ControlNode.h"
 //#include "autopilot/DroneController.h"
 #include "ros/ros.h"
 #include "ros/package.h"
