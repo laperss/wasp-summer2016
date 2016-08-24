@@ -9,6 +9,7 @@
 #include <sstream>
 #include <pthread.h> // for sleep
 #include <ardrone_autonomy/Navdata.h>
+#include <tum_ardrone/filter_state.h>
 
 
 void sendControlToDrone(ros::Publisher pub, ControlCommand cmd)
@@ -70,8 +71,17 @@ void Control_Thread()
     sleep(1);
     while (true)
     {
-	ardrone_autonomy::Navdata navdata = ardrone_navdata.Read_navdata();
-	std::cout << "Procent: " << navdata.batteryPercent << "\n";
+	tum_ardrone::filter_state state_estimation = ardrone_navdata.Read_state_estimation();
+	//ardrone_autonomy::Navdata navdata = ardrone_navdata.Read_navdata();
+	float x = ardrone_navdata.x;
+	float y = ardrone_navdata.y;
+	float z = ardrone_navdata.z;
+	float yaw = ardrone_navdata.yaw;
+	int state = ardrone_navdata.state;
+//# 0: Unknown, 1: Init, 2: Landed, 3: Flying, 4: Hovering, 5: Test
+//# 6: Taking off, 7: Goto Fix Point, 8: Landing, 9: Looping
+	std::cout << "Current position is: " << x <<", " << y << ", " << z <<"\n";
+	std::cout << "Current state is: " << state <<"\n";
     }
     ros::Publisher takeoff_pub = n.advertise<std_msgs::Empty>("/ardrone/takeoff", 1000);
     sleep(1);
