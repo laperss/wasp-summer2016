@@ -15,6 +15,7 @@ the datamonitor ArdroneNavdata.h
 #include <ardrone_autonomy/Navdata.h>
 #include <tum_ardrone/filter_state.h>
 #include <pthread.h> // for sleep
+#include <wasp_custom_msgs/object_loc.h>
 
 void nav_callback(const ardrone_autonomy::Navdata::ConstPtr& msg)
 {
@@ -25,8 +26,13 @@ void nav_callback(const ardrone_autonomy::Navdata::ConstPtr& msg)
 
 void pose_callback(const tum_ardrone::filter_state::ConstPtr& msg)
 {
-    std::cout << "pose callback\n";
     ardrone_navdata.Update_stateEstimation(msg);
+    return;
+}
+
+void apriltag_callback(const wasp_custom_msgs::object_loc::ConstPtr& msg)
+{
+    ardrone_navdata.Update_apriltag(msg);
     return;
 }
 
@@ -38,6 +44,8 @@ void Subscribe_Thread()
 
     // Subscribe to state estimation
     ros::Subscriber predictedPose_sub = n.subscribe<tum_ardrone::filter_state>("/ardrone/predictedPose",1000,pose_callback);
+
+    ros::Subscriber aprilTag_sub = n.subscribe<wasp_custom_msgs::object_loc>("/object_location",1000,apriltag_callback);
 
     ros::spin();
     return;

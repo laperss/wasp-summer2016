@@ -73,15 +73,17 @@ void Control_Thread()
     {
 	tum_ardrone::filter_state state_estimation = ardrone_navdata.Read_state_estimation();
 	//ardrone_autonomy::Navdata navdata = ardrone_navdata.Read_navdata();
-	float x = state_estimation.x;
-	float y = state_estimation.y;
-	float z = state_estimation.z;
-	float yaw = state_estimation.yaw;
+	//float x = state_estimation.x;
+	//float y = state_estimation.y;
+	//float z = state_estimation.z;
+	//float yaw = state_estimation.yaw;
 	int state = state_estimation.droneState;
+	wasp_custom_msgs::object_loc apriltag_pos = ardrone_navdata.Read_apriltag();
+	std::cout << "\r ID: " << apriltag_pos.ID;
 //# 0: Unknown, 1: Init, 2: Landed, 3: Flying, 4: Hovering, 5: Test
 //# 6: Taking off, 7: Goto Fix Point, 8: Landing, 9: Looping
-	std::cout << "Current position is: " << x <<", " << y << ", " << z <<"\n";
-	std::cout << "Current state is: " << state <<"\n";
+	//std::cout << "Current position is: " << x <<", " << y << ", " << z <<"\n";
+	//std::cout << "Current state is: " << state <<"\n";
     }
     ros::Publisher takeoff_pub = n.advertise<std_msgs::Empty>("/ardrone/takeoff", 1000);
     sleep(1);
