@@ -73,11 +73,11 @@ void Control_Thread()
     {
 	tum_ardrone::filter_state state_estimation = ardrone_navdata.Read_state_estimation();
 	//ardrone_autonomy::Navdata navdata = ardrone_navdata.Read_navdata();
-	float x = ardrone_navdata.x;
-	float y = ardrone_navdata.y;
-	float z = ardrone_navdata.z;
-	float yaw = ardrone_navdata.yaw;
-	int state = ardrone_navdata.state;
+	float x = state_estimation.x;
+	float y = state_estimation.y;
+	float z = state_estimation.z;
+	float yaw = state_estimation.yaw;
+	int state = state_estimation.droneState;
 //# 0: Unknown, 1: Init, 2: Landed, 3: Flying, 4: Hovering, 5: Test
 //# 6: Taking off, 7: Goto Fix Point, 8: Landing, 9: Looping
 	std::cout << "Current position is: " << x <<", " << y << ", " << z <<"\n";
