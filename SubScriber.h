@@ -32,7 +32,7 @@ void pose_callback(const tum_ardrone::filter_state::ConstPtr& msg)
 
 void apriltag_callback(const wasp_custom_msgs::object_loc::ConstPtr& msg)
 {
-    ardrone_navdata.Update_apriltag(msg);
+    ardrone_navdata.Update_objectlist(msg);
     return;
 }
 

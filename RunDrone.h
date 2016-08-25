@@ -77,7 +77,7 @@ void Control_Thread()
 	//float y = state_estimation.y;
 	//float z = state_estimation.z;
 	//float yaw = state_estimation.yaw;
-	int state = state_estimation.droneState;
+	//int state = state_estimation.droneState;
 
 	vector<wasp_custom_msgs::object_loc> obj_vector = ardrone_navdata.get_objects();
 
