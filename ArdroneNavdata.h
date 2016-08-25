@@ -31,6 +31,11 @@ navdata as is, i.e. as an "ardrone_autonomy::Navdata"
 #include <tum_ardrone/filter_state.h>
 #include <wasp_custom_msgs/object_loc.h>
 #include <vector>
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
 #ifndef _ARDRONE_NAVDATA
 #define _ARDRONE_NAVDATA
 
@@ -42,21 +47,17 @@ private:
     ardrone_autonomy::Navdata local_navdata;
     tum_ardrone::filter_state state_estimation;
     //wasp_custom_msgs::object_loc apriltag_pos;
-    std::vector<wasp_custom_msgs::object_loc> object_vector;
-
-
-    
- public:
+    vector<wasp_custom_msgs::object_loc> object_vector;
 
     bool does_object_exists(wasp_custom_msgs::object_loc obj)
     {
       bool exists=false;
   
       mtx_.lock();
-      std::vector<wasp_custom_msgs::object_loc> obj_vec_loc = object_vector;
+      vector<wasp_custom_msgs::object_loc> obj_vec_loc = object_vector;
       mtx_.unlock();
   
-      std::vector<wasp_custom_msgs::object_loc>::iterator it;
+      vector<wasp_custom_msgs::object_loc>::iterator it;
       for(it = obj_vec_loc.begin(); it!=obj_vec_loc.end(); it++)
 	{
 	  if(it->ID == obj.ID)
@@ -67,6 +68,8 @@ private:
 
       return exists;
     }
+    
+ public:
 	
     ardrone_autonomy::Navdata Read_navdata() 
     {
@@ -93,7 +96,7 @@ private:
     std::vector<wasp_custom_msgs::object_loc> get_objects() 
     {
 	mtx_.lock();
-	std::vector<wasp_custom_msgs::object_loc> objvec = object_vector;
+	vector<wasp_custom_msgs::object_loc> objvec = object_vector;
 	mtx_.unlock();
 	return objvec;
     }
@@ -116,6 +119,25 @@ private:
 	    object_vector.push_back(obj);
 	    mtx_.unlock();
 	  }	
+    }
+
+    void write_objects_to_file()
+    {
+      ofstream myfile;
+      myfile.open ("object_file.txt");
+      myfile << "Writing found objects: \n";
+
+      mtx_.lock();
+      vector<wasp_custom_msgs::object_loc> obj_vec_loc = object_vector;
+      mtx_.unlock();
+      
+      vector<wasp_custom_msgs::object_loc>::iterator it;
+      for(it = obj_vec_loc.begin(); it!=obj_vec_loc.end(); it++)
+	{
+	  myfile << "ID: " << it->ID << " x: " << it->point.x 
+		 << " y: " << it->point.y << " z: " << it->point.z << "\n";
+	}
+      myfile.close();
     }
 
 } ardrone_navdata;
