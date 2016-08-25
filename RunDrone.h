@@ -10,7 +10,7 @@
 #include <pthread.h> // for sleep
 #include <ardrone_autonomy/Navdata.h>
 #include <tum_ardrone/filter_state.h>
-
+using namespace std;
 
 void sendControlToDrone(ros::Publisher pub, ControlCommand cmd)
 {
@@ -70,7 +70,7 @@ void Control_Thread()
     ros::NodeHandle n;
     sleep(1);
     while (true)
-    {
+      {
 	tum_ardrone::filter_state state_estimation = ardrone_navdata.Read_state_estimation();
 	//ardrone_autonomy::Navdata navdata = ardrone_navdata.Read_navdata();
 	//float x = state_estimation.x;
@@ -78,8 +78,19 @@ void Control_Thread()
 	//float z = state_estimation.z;
 	//float yaw = state_estimation.yaw;
 	int state = state_estimation.droneState;
-	wasp_custom_msgs::object_loc apriltag_pos = ardrone_navdata.Read_apriltag();
-	std::cout << "\r ID: " << apriltag_pos.ID;
+
+	vector<wasp_custom_msgs::object_loc> obj_vector = ardrone_navdata.get_objects();
+
+	if(obj_vector.size()!=0)
+	  {
+	  cout << "\r";
+	  std::vector<wasp_custom_msgs::object_loc>::iterator it;
+	  for(it = obj_vector.begin(); it!=obj_vector.end(); it++)
+	    {
+	      cout << " ID: " << it->ID;
+	    }
+	  }
+  
 //# 0: Unknown, 1: Init, 2: Landed, 3: Flying, 4: Hovering, 5: Test
 //# 6: Taking off, 7: Goto Fix Point, 8: Landing, 9: Looping
 	//std::cout << "Current position is: " << x <<", " << y << ", " << z <<"\n";
