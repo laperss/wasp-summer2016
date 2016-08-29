@@ -1,49 +1,70 @@
-To have multiple masters one should follow this :)
+Simple example of using `multimaster_fkie` package. It makes it
+possible to have multiple masters communicating.
 
-This package will make different masters share topics over the
-ros-network so that every master can publish/subscribe to all topics :)
+Webpage: http://wiki.ros.org/multimaster_fkie/Tutorials/
 
-For our purposes this will make it possible to have one roscore-master
-running on Linneas compuert (which has all the ardrone topics but no
-turtlebot topics) and one roscore-master running on the turtlebot
-computer (we have to have one there in order to control the cameras
-and that stuff). We then start the magic from this package and it will
-be possible to see all the turtlebot topics on Linneas computer.
-
-first you have to install a package fkie_multimasters:
-
-1. Download and install the package on all computers where you will
-have a ros_master running:
-
+1. Download and install the package
 ```
-$ git clone https://github.com/fkie/multimaster_fkie.git
-$ cd ..
-$ catkin_make
+git clone https://github.com/fkie/multimaster_fkie.git
+cd ..
+catkin_make
 ```
 
-2. Test it with a simple example if you wish. Follow the tutorial on
-http://wiki.ros.org/multimaster_fkie/Tutorials/
+2. Simple example with one host:
 
-3. On the turtlebot pc (the package is installed) we need to run the following in three different terminal windows:
+You need two terminal windows open.
 
-```
-terminal1$ roslaunch turtlebot_bringup minimal.launch 
-terminal2$ rosrun master_discovery_fkie master_discovery
-treminal3$ rosrun master_sync_fkie master_sync
-```
-
-Alternatively one could do it like this and use only a single
-terminal. This will start the processes and run them silently in the
-background:
-
-```
-$ roslaunch turtlebot_bringup minimal.launch >/dev/null 2>&1 &
-$ rosrun master_discovery_fkie master_discovery >/dev/null 2>&1 &
-$ rosrun master_sync_fkie master_sync  >/dev/null 2>&1 &
+In first terminal window we will start a ROS master and an example
+publisher, which publish `Hello World` to topic with name
+`/test/topic`. Note that this master is communicating on port 11311.
+``` export ROS_MASTER_URI=http://localhost:11311 roscore >/dev/null
+2>&1 & rostopic pub /test/topic std_msgs/String 'Hello World' -r 1 &
 ```
 
-If you wish to kill all the processes created by the user (turtlebot)
-and logout:
+In the second terminal we will try to subscribe to this topic but with
+a master communicating on a different port.
 ```
-$pkill -u turtlebot
+export ROS_MASTER_URI=http://localhost:11312
+roscore --port 11312 >/dev/null 2>&1 &
+rostopic echo /test/topic &
 ```
+
+At this moment nothing will be published on the master at
+`localhost:11312` so nothing should be printed in the second terminal.
+
+Now we will start a `master_discovery` node and a `master_sync` node
+in both terminals which will make it possible for the two masters to
+find each other and communicate with each other,
+
+In 1st terminal:
+```
+rosrun master_discovery_fkie master_discovery >/dev/null 2>&1 &
+rosrun master_sync_fkie master_sync >/dev/null 2>&1 &
+```
+In 2nd terminal:
+```
+rosrun master_discovery_fkie master_discovery >/dev/null 2>&1 &
+rosrun master_sync_fkie master_sync >/dev/null 2>&1 &
+```
+
+Now both ROS-masters are synchronized and the second terminal should
+start printing the `Hello World` message.
+
+3. This extends well to have one master on a pc connected to the AR
+   Drone and one running on the turtlebot-pc.
+
+
+On the turtlebot pc (install the package first) we need to run the
+following in three different terminal windows:
+```
+roslaunch turtlebot_bringup minimal.launch >/dev/null 2>&1 &
+rosrun master_discovery_fkie master_discovery >/dev/null 2>&1 &
+rosrun master_sync_fkie master_sync  >/dev/null 2>&1 &
+```
+
+Then run the same on the other pc with the master connected to the AR
+Drone. Check all the `rostopics` to see if it worked:
+```
+rostopic list -v
+```
+
