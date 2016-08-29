@@ -5,6 +5,7 @@ Webpage: http://wiki.ros.org/multimaster_fkie/Tutorials/
 ### 1. Download and install the package 
 
 ```
+cd ~/catkin_ws/src
 git clone https://github.com/fkie/multimaster_fkie.git
 cd ..
 catkin_make
